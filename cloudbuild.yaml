@@ -1,0 +1,18 @@
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - run
+  - deploy
+  - shopee-aff-bot
+  - --region=asia-southeast1
+  - --source=.
+  - --allow-unauthenticated
+  - --set-env-vars=NODE_ENV=production,TG_BOT_TOKEN=${_TG_BOT_TOKEN},AT_API_KEY=${_AT_API_KEY},AT_SUB4=shopee_promotebot
+  - --timeout=900
+  - --quiet
+
+substitutions:
+  _TG_BOT_TOKEN: "REDACTED"
+  _AT_API_KEY: "REDACTED"
+
+timeout: "1200s"

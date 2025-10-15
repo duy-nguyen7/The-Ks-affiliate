@@ -1,0 +1,38 @@
+name: CI/CD — Deploy to Cloud Run
+
+on:
+  push:
+    branches: [ "main" ]   # chỉ deploy khi push main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        workload_identity_provider: projects/49764591239/locations/global/workloadIdentityPools/your-pool/providers/github-provider
+        service_account: your-sa@your-project.iam.gserviceaccount.com
+
+    - name: Configure gcloud
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: your-gcp-project-id
+        install_components: gke-gcloud-auth-plugin
+
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy shopee-aff-bot \
+          --region asia-southeast1 \
+          --source . \
+          --allow-unauthenticated \
+          --set-env-vars=NODE_ENV=production,TG_BOT_TOKEN=${{ secrets.TG_BOT_TOKEN }},AT_API_KEY=${{ secrets.AT_API_KEY }},AT_SUB4=shopee_promotebot \
+          --timeout=900 \
+          --quiet
